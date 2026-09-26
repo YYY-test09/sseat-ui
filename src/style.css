@@ -12,3 +12,11 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
+
+/* 去掉下拉菜单项获得焦点时闪烁的文本光标
+   （下拉弹层渲染在 body 根下，必须写在公共样式里，组件 scoped 样式管不到） */
+.el-dropdown-menu__item {
+  user-select: none;
+  caret-color: transparent;
+  outline: none;
+}
