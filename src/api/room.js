@@ -3,7 +3,8 @@ import request from './request'
 // ---------- 自习室（前台浏览，GET 均免登录） ----------
 export const getRoomPage = (params) => request.get('/rooms', { params })
 export const getRoomDetail = (id) => request.get(`/rooms/${id}`)
-// 自习室点赞/收藏接口后端仍保留，但详情页已按需求移除该入口（论坛帖子的点赞收藏不受影响）
+export const toggleRoomLike = (id) => request.post(`/rooms/${id}/like`)
+export const toggleRoomFavorite = (id) => request.post(`/rooms/${id}/favorite`)
 
 // ---------- 自习室（管理端） ----------
 export const getAdminRoomPage = (params) => request.get('/admin/rooms', { params })
