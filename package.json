@@ -1,0 +1,24 @@
+{
+  "name": "sseat-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "-",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "axios": "^1.20.0",
+    "element-plus": "^2.14.6",
+    "pinia": "^4.0.3",
+    "vue": "^3.5.43",
+    "vue-router": "^4.6.4"
+  }
+}
