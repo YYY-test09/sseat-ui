@@ -19,7 +19,7 @@ function logout() {
   <div>
     <div class="header">
       <div class="header-inner">
-        <div class="logo" @click="router.push('/')">📚 校园自习室</div>
+        <div class="logo" @click="router.push('/')">📚 简座</div>
         <el-menu mode="horizontal" :default-active="$route.path" router :ellipsis="false" class="nav">
           <el-menu-item index="/">自习室</el-menu-item>
           <el-menu-item index="/forum">论坛</el-menu-item>

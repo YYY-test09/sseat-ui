@@ -70,7 +70,7 @@ onMounted(refreshCaptcha)
 <template>
   <div class="login-bg">
     <el-card class="login-card">
-      <div class="brand">📚 校园自习室预约与管理系统</div>
+      <div class="brand">📚 简座 · 校园自习室预约与管理系统</div>
       <el-tabs v-model="tab" stretch>
         <el-tab-pane label="账号密码登录" name="account">
           <el-form @submit.prevent="doLogin">

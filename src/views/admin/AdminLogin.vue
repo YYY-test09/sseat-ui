@@ -48,7 +48,7 @@ onMounted(refreshCaptcha)
 <template>
   <div class="admin-bg">
     <el-card class="login-card">
-      <div class="brand">🛠 自习室管理系统 · 后台</div>
+      <div class="brand">🛠 简座 · 管理后台</div>
       <el-form @submit.prevent="doLogin">
         <el-form-item>
           <el-input v-model="form.username" placeholder="管理员账号" size="large" :prefix-icon="'User'" />
