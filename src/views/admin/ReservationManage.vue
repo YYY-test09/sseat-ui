@@ -42,12 +42,12 @@ async function loadOptions() {
 }
 
 function openCreate() {
-  form.value = { userId: null, roomId: null, reserveDate: '', startHour: 9, seatNo: 1, status: 0 }
+  form.value = { userId: null, roomId: null, reserveDate: '', startHour: 9, endHour: 12, seatNo: 1, status: 0 }
   dialog.value = true
 }
 
 function openEdit(row) {
-  form.value = { ...row }
+  form.value = { ...row, endHour: row.endHour ?? (row.startHour + 1) }
   dialog.value = true
 }
 
@@ -55,10 +55,13 @@ async function submit() {
   if (!form.value.userId || !form.value.roomId || !form.value.reserveDate) {
     return ElMessage.warning('请填写用户、自习室和日期')
   }
+  if (form.value.endHour <= form.value.startHour) {
+    return ElMessage.warning('结束时间必须晚于开始时间')
+  }
   await saveAdminReservation({
     id: form.value.id, userId: form.value.userId, roomId: form.value.roomId,
     reserveDate: form.value.reserveDate, startHour: form.value.startHour,
-    seatNo: form.value.seatNo, status: form.value.status
+    endHour: form.value.endHour, seatNo: form.value.seatNo, status: form.value.status
   })
   ElMessage.success('保存成功')
   dialog.value = false
@@ -79,7 +82,8 @@ function remove(row) {
   }).catch(() => {})
 }
 
-const HOURS = Array.from({ length: 13 }, (_, i) => i + 8)
+const HOURS = Array.from({ length: 13 }, (_, i) => i + 8)          // 开始整点 8~20
+const END_HOURS = Array.from({ length: 13 }, (_, i) => i + 9)      // 结束整点 9~21
 
 onMounted(() => { load(); loadOptions() })
 </script>
@@ -149,9 +153,14 @@ onMounted(() => { load(); loadOptions() })
         <el-form-item label="预约日期" required>
           <el-date-picker v-model="form.reserveDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
         </el-form-item>
-        <el-form-item label="时段">
+        <el-form-item label="开始时间">
           <el-select v-model="form.startHour" style="width:100%">
-            <el-option v-for="h in HOURS" :key="h" :label="`${String(h).padStart(2,'0')}:00 - ${String(h+1).padStart(2,'0')}:00`" :value="h" />
+            <el-option v-for="h in HOURS" :key="h" :label="`${String(h).padStart(2,'0')}:00`" :value="h" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-select v-model="form.endHour" style="width:100%">
+            <el-option v-for="h in END_HOURS" :key="h" :label="`${String(h).padStart(2,'0')}:00`" :value="h" />
           </el-select>
         </el-form-item>
         <el-form-item label="座位号">

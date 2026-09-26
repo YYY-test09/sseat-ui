@@ -9,7 +9,7 @@ const request = axios.create({
 
 // 请求拦截器：每个请求自动带上登录令牌
 request.interceptors.request.use((config) => {
-  const token = localStorage.getItem('sseat_token')
+  const token = sessionStorage.getItem('sseat_token')
   if (token) {
     config.headers.Authorization = 'Bearer ' + token
   }
@@ -33,8 +33,8 @@ request.interceptors.response.use(
     if (status === 401) {
       // 令牌失效/未登录。登录和验证码接口本身的 401 不跳转，避免死循环
       if (!url.includes('/auth/')) {
-        localStorage.removeItem('sseat_token')
-        localStorage.removeItem('sseat_user')
+        sessionStorage.removeItem('sseat_token')
+        sessionStorage.removeItem('sseat_user')
         ElMessage.warning('登录已过期，请重新登录')
         const path = location.pathname
         location.href = path.startsWith('/admin') ? '/admin/login' : '/login'

@@ -64,6 +64,9 @@ function logout() {
 .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 60px; }
 .logo { font-size: 18px; font-weight: 700; color: #409eff; cursor: pointer; white-space: nowrap; margin-right: 24px; }
 .nav { flex: 1; border-bottom: none !important; }
+/* 去掉菜单项聚焦时闪烁的文本光标与虚线外框（纯视觉修正） */
+.nav :deep(.el-menu-item) { user-select: none; caret-color: transparent; }
+.nav :deep(.el-menu-item:focus), .nav :deep(.el-menu-item:active) { outline: none; }
 .user-area { display: flex; align-items: center; gap: 8px; }
 .user-name { display: flex; align-items: center; cursor: pointer; outline: none; }
 </style>

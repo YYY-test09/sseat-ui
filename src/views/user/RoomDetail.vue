@@ -1,9 +1,9 @@
 <script setup>
-// 自习室详情页：大图、描述、设施清单、点赞收藏（需登录），以及"去预约"入口
+// 自习室详情页：大图、描述、设施清单，以及"去预约"入口（点赞/收藏已按需求从此页移除）
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getRoomDetail, toggleRoomLike, toggleRoomFavorite } from '../../api/room'
+import { getRoomDetail } from '../../api/room'
 import { useUserStore } from '../../store/user'
 
 const route = useRoute()
@@ -11,8 +11,6 @@ const router = useRouter()
 const store = useUserStore()
 
 const room = ref(null)
-const liked = ref(false)
-const favorited = ref(false)
 const loading = ref(true)
 
 async function load() {
@@ -20,14 +18,12 @@ async function load() {
   try {
     const data = await getRoomDetail(route.params.id)
     room.value = data.room
-    liked.value = data.liked
-    favorited.value = data.favorited
   } finally {
     loading.value = false
   }
 }
 
-// 未登录点击交互按钮 → 引导登录（需求：浏览开放，交互需登录）
+// 未登录点击预约 → 引导登录（需求：浏览开放，交互需登录）
 function requireLogin() {
   if (!store.user) {
     ElMessage.warning('请先登录')
@@ -35,20 +31,6 @@ function requireLogin() {
     return true
   }
   return false
-}
-
-async function like() {
-  if (requireLogin()) return
-  const r = await toggleRoomLike(room.value.id)
-  liked.value = r.liked
-  room.value.likeCount += r.liked ? 1 : -1
-}
-
-async function favorite() {
-  if (requireLogin()) return
-  const r = await toggleRoomFavorite(room.value.id)
-  favorited.value = r.favorited
-  ElMessage.success(r.favorited ? '已收藏' : '已取消收藏')
 }
 
 function goBook() {
@@ -94,12 +76,6 @@ onMounted(load)
           <div class="actions">
             <el-button type="primary" size="large" :disabled="room.status !== 1" @click="goBook">
               {{ room.status === 1 ? '去预约' : '暂停预约' }}
-            </el-button>
-            <el-button size="large" :type="liked ? 'danger' : 'default'" @click="like">
-              {{ liked ? '❤ 已点赞' : '🤍 点赞' }} {{ room.likeCount }}
-            </el-button>
-            <el-button size="large" :type="favorited ? 'warning' : 'default'" @click="favorite">
-              {{ favorited ? '★ 已收藏' : '☆ 收藏' }}
             </el-button>
           </div>
         </el-col>
