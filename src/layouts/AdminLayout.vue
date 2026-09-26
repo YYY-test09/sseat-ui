@@ -10,6 +10,7 @@ const store = useUserStore()
 
 // 全部后台菜单；menus 字段里没有的 key 不显示（角色管理里可配置）
 const allMenus = [
+  { key: 'dashboard', path: '/admin/dashboard', title: '数据统计', icon: 'DataAnalysis' },
   { key: 'room', path: '/admin/rooms', title: '自习室座位管理', icon: 'School' },
   { key: 'reservation', path: '/admin/reservations', title: '预约管理', icon: 'Calendar' },
   { key: 'post', path: '/admin/posts', title: '论坛管理', icon: 'ChatDotSquare' },

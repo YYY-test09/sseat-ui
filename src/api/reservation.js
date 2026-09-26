@@ -6,6 +6,7 @@ export const getOccupiedSeats = (params) => request.get('/user/reservations/seat
 export const bookRoom = (data) => request.post('/user/reservations', data)
 export const getMyReservations = (params) => request.get('/user/reservations/my', { params })
 export const cancelReservation = (id) => request.put(`/user/reservations/${id}/cancel`)
+export const checkinReservation = (id) => request.put(`/user/reservations/${id}/checkin`)
 
 // ---------- 管理端预约 ----------
 export const getAdminReservationPage = (params) => request.get('/admin/reservations', { params })

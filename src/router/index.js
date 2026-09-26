@@ -46,7 +46,8 @@ const routes = [
     component: () => import('../layouts/AdminLayout.vue'),
     meta: { requiresLogin: true, roles: ['admin'] },
     children: [
-      { path: '', redirect: '/admin/rooms' },
+      { path: '', redirect: '/admin/dashboard' },
+      { path: 'dashboard', component: () => import('../views/admin/Dashboard.vue'), meta: { menu: 'dashboard' } },
       { path: 'rooms', component: () => import('../views/admin/RoomManage.vue'), meta: { menu: 'room' } },
       { path: 'reservations', component: () => import('../views/admin/ReservationManage.vue'), meta: { menu: 'reservation' } },
       { path: 'posts', component: () => import('../views/admin/PostManage.vue'), meta: { menu: 'post' } },

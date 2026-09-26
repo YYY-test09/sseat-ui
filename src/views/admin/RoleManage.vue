@@ -12,6 +12,7 @@ const isEdit = ref(false)
 
 // 后台菜单全集：勾选哪些，该角色的用户登录后就能看到哪些菜单
 const MENU_OPTIONS = [
+  { key: 'dashboard', label: '数据统计' },
   { key: 'room', label: '自习室座位管理' },
   { key: 'reservation', label: '预约管理' },
   { key: 'post', label: '论坛管理' },
