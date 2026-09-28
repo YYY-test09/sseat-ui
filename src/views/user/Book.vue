@@ -30,11 +30,11 @@ const seatCount = computed(() => selectedRoom.value?.seatCount || 0)
 
 // 开始时间候选：未开始的整点
 const startOptions = computed(() => slots.value.filter(s => !s.past))
-// 结束时间候选：晚于开始时间的整点（结束=下一时段的开始，最大到闭馆时间）
+// 结束时间候选：晚于开始时间的整点（结束=下一时段的开始，最短可约1小时，最大到闭馆时间）
 const endOptions = computed(() => {
   if (form.startHour === null) return []
   const opts = []
-  for (const s of slots.value) if (s.hour > form.startHour) opts.push({ hour: s.hour + 1, label: hh(s.hour + 1) })
+  for (const s of slots.value) if (s.hour + 1 > form.startHour) opts.push({ hour: s.hour + 1, label: hh(s.hour + 1) })
   return opts
 })
 
