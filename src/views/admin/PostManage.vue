@@ -1,13 +1,20 @@
 <script setup>
-// 管理端-论坛管理：帖子列表(可按状态筛) + 通过/驳回(带原因) + 删除 + 查看详情
+// 管理端-论坛管理：帖子列表(可按状态筛) + 通过/驳回(带原因) + 删除 + 查看正文弹窗
+// 待审核/已驳回帖子用户端接口不可见，故"查看"走管理端专用详情接口开弹窗审核，
+// 而不是跳用户端详情页（早期跳 /forum/:id 导致管理员看不到待审核内容无法审核——已修复）
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getAdminPostPage, auditPost, deleteAdminPost, POST_STATUS_TEXT, POST_STATUS_TYPE, POST_TYPES } from '../../api/post'
+import { getAdminPostPage, getAdminPostDetail, auditPost, deleteAdminPost,
+         POST_STATUS_TEXT, POST_STATUS_TYPE, POST_TYPES } from '../../api/post'
 
 const query = reactive({ page: 1, size: 10, keyword: '', type: '', status: null })
 const list = ref([])
 const total = ref(0)
 const loading = ref(false)
+
+const viewVisible = ref(false)
+const viewLoading = ref(false)
+const viewPost = ref(null)
 
 async function load() {
   loading.value = true
@@ -40,6 +47,16 @@ function remove(row) {
   ElMessageBox.confirm(`删除帖子「${row.title}」及其全部评论？`, '警告', { type: 'warning' }).then(async () => {
     await deleteAdminPost(row.id); ElMessage.success('已删除'); load()
   }).catch(() => {})
+}
+
+// 查看/审核正文：走管理端详情接口（未过审帖子用户端接口不可见，必须用它）
+async function view(row) {
+  viewVisible.value = true
+  viewLoading.value = true
+  viewPost.value = null
+  try {
+    viewPost.value = await getAdminPostDetail(row.id)
+  } finally { viewLoading.value = false }
 }
 
 onMounted(load)
@@ -77,11 +94,12 @@ onMounted(load)
       <el-table-column prop="rejectReason" label="驳回原因" min-width="110">
         <template #default="{ row }"><span :class="{ gray: !row.rejectReason }">{{ row.rejectReason || '—' }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" width="210">
+      <el-table-column label="操作" width="250">
         <template #default="{ row }">
           <el-button v-if="row.status !== 1" size="small" type="success" link @click="pass(row)">通过</el-button>
           <el-button v-if="row.status !== 2" size="small" type="warning" link @click="reject(row)">驳回</el-button>
-          <el-button size="small" link type="primary" @click="$router.push(`/forum/${row.id}`)">查看</el-button>
+          <el-button size="small" link type="primary" @click="view(row)">查看</el-button>
+          <el-button v-if="row.status === 1" size="small" link type="info" @click="$router.push(`/forum/${row.id}`)">前台页</el-button>
           <el-button size="small" link type="danger" @click="remove(row)">删除</el-button>
         </template>
       </el-table-column>
@@ -89,6 +107,33 @@ onMounted(load)
 
     <el-pagination class="pager" layout="total, prev, pager, next" :total="total"
                    v-model:current-page="query.page" :page-size="query.size" @change="load" />
+
+    <!-- 审核弹窗：未过审内容仅管理端接口可见，直接在此读正文并裁决 -->
+    <el-dialog v-model="viewVisible" title="帖子内容与审核" width="640px" top="6vh">
+      <div v-loading="viewLoading" style="min-height:120px">
+        <template v-if="viewPost">
+          <div class="vd-head">
+            <span class="vd-title">{{ viewPost.title }}</span>
+            <el-tag :type="POST_STATUS_TYPE[viewPost.status]">{{ POST_STATUS_TEXT[viewPost.status] }}</el-tag>
+          </div>
+          <div class="vd-meta">
+            {{ viewPost.authorName }} · {{ viewPost.type }} · {{ viewPost.createTime }} ·
+            浏览 {{ viewPost.viewCount }}
+          </div>
+          <el-image v-if="viewPost.coverImg" :src="viewPost.coverImg" class="vd-cover" fit="cover" />
+          <div class="vd-content">{{ viewPost.content }}</div>
+          <el-alert v-if="viewPost.rejectReason" type="error" :closable="false" show-icon
+                    :title="'当前驳回原因：' + viewPost.rejectReason" style="margin-top:10px" />
+        </template>
+      </div>
+      <template #footer>
+        <el-button v-if="viewPost && viewPost.status !== 1" type="success"
+                   @click="pass(viewPost); viewVisible = false">通过</el-button>
+        <el-button v-if="viewPost && viewPost.status !== 2" type="warning"
+                   @click="reject(viewPost); viewVisible = false">驳回</el-button>
+        <el-button @click="viewVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -97,4 +142,10 @@ onMounted(load)
 .filters { display: flex; gap: 10px; }
 .gray { color: #c0c4cc; }
 .pager { margin-top: 14px; justify-content: flex-end; }
+.vd-head { display: flex; align-items: center; gap: 10px; }
+.vd-title { font-size: 16px; font-weight: 600; }
+.vd-meta { color: #909399; font-size: 12px; margin-top: 6px; }
+.vd-cover { width: 100%; max-height: 200px; border-radius: 6px; margin: 10px 0; }
+.vd-content { margin-top: 10px; max-height: 320px; overflow-y: auto; white-space: pre-wrap;
+  background: #f7f9fc; border-radius: 6px; padding: 12px; font-size: 14px; line-height: 1.7; }
 </style>

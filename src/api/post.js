@@ -16,6 +16,7 @@ export const deleteMyPost = (id) => request.delete(`/user/posts/${id}`)
 
 // ---------- 管理端论坛 ----------
 export const getAdminPostPage = (params) => request.get('/admin/posts', { params })
+export const getAdminPostDetail = (id) => request.get(`/admin/posts/${id}`)
 export const auditPost = (data) => request.put('/admin/posts/audit', data)
 export const deleteAdminPost = (id) => request.delete(`/admin/posts/${id}`)
 
